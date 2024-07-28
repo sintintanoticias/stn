@@ -1,0 +1,51 @@
+name: Fetch News
+
+on:
+  schedule:
+    - cron: '0 * * * *' # Runs every hour
+  push:
+    branches:
+      - main
+
+jobs:
+  fetch_news:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests
+
+    - name: Check Python version
+      run: python --version
+
+    - name: List files in directory
+      run: ls -la
+
+    - name: Verify fetch_news.py exists
+      run: ls -la fetch_news.py
+
+    - name: Run fetch_news.py
+      run: |
+        echo "Running fetch_news.py..."
+        python fetch_news.py
+        echo "Script finished running."
+
+    - name: Check contents of news.json
+      run: cat news.json
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./
+        publish_branch: gh-pages
